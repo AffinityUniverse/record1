@@ -136,15 +136,15 @@ let currentStampKey = null;
 function stampRandomImage(stampList) {
   // 0 ~ (배열 길이-1) 사이의 랜덤한 정수 인덱스를 뽑는다
   const randomIndex = Math.floor(Math.random() * stampList.length);
-  const selectedKey = stampList[randomIndex]; // 예: "female_01"
+  const selectedStamp = stampList[randomIndex];
 
   // #stamp-image 의 src를 바꿔주기만 하면
   // 기존에 찍혀있던 도장은 자동으로 "교체"된다 (쌓이지 않음)
-  stampImage.src = BASE64_IMAGES[selectedKey];
+  stampImage.src = selectedStamp;
   stampImage.style.display = "block";
 
   // 어떤 도장이 찍혔는지, 실제로 찍혔다는 사실을 기록해둔다
-  currentStampKey = selectedKey;
+  currentStampKey = selectedStamp;
   hasStamp = true;
 }
 
@@ -261,18 +261,16 @@ btnDownload.addEventListener("click", async function () {
     // 배경/테이프는 파일 경로가 아니라 images-base64.js에 내장된 데이터를 사용한다.
     // -> 이렇게 하면 file://로 직접 열었을 때도 캔버스가 "오염(tainted)"되지 않아서
     //    어떤 환경에서든 다운로드가 항상 정상적으로 작동한다.
-    const [bgImg, userImg, tapeImg] = await Promise.all([
-      loadImage(BASE64_IMAGES.background),
-      loadImage(uploadedImage.src), // 업로드 이미지도 이미 base64 데이터라 문제 없음
-      loadImage(BASE64_IMAGES.tape)
-    ]);
+const [bgImg, userImg] = await Promise.all([
+  loadImage("./background.png"),
+  loadImage(uploadedImage.src)
+]);
 
     // 도장은 실제로 찍은 경우에만 불러온다 (hasStamp / currentStampKey로 정확하게 확인)
     let stampImg = null;
-    if (hasStamp && currentStampKey) {
-      stampImg = await loadImage(BASE64_IMAGES[currentStampKey]);
-    }
-
+if (hasStamp && currentStampKey) {
+  stampImg = await loadImage(currentStampKey);
+}
     /* ---- 레이어 순서를 지켜서 순서대로 그린다 ---- */
 
     // 1. 배경 (캔버스 전체를 꽉 채운다)
@@ -285,10 +283,7 @@ btnDownload.addEventListener("click", async function () {
       cfg.uploadFrame.width, cfg.uploadFrame.height
     );
 
-    // 3. 테이프 (캔버스 전체를 꽉 채운다)
-    ctx.drawImage(tapeImg, 0, 0, cfg.canvasWidth, cfg.canvasHeight);
-
-    // 4. 도장 (있다면 지정된 프레임 안에 contain 방식으로 그린다)
+    // 3. 도장 (있다면 지정된 프레임 안에 contain 방식으로 그린다)
     if (stampImg) {
       drawImageContain(
         ctx, stampImg,
