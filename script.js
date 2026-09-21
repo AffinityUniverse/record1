@@ -20,17 +20,21 @@
         새로운 항목(예: female_03: "data:image/png;base64,...")을 추가하고,
      2. 아래 배열에 그 key 이름을 한 줄 추가하면 된다.
    (key는 images-base64.js의 BASE64_IMAGES 객체 안에 있는 이름과 정확히 같아야 한다) */
-const FEMALE_STAMPS = ["female_01", "female_02"];
-const MALE_STAMPS = ["male_01", "male_02"];
+const FEMALE_STAMPS = [
+  "./female_01.png",
+  "./female_02.png"
+];
 
+const MALE_STAMPS = [
+  "./male_01.png",
+  "./male_02.png"
+];
 
 /* ============================================================
    페이지가 열리자마자 배경/테이프 이미지를 base64 데이터로 채워 넣는다.
    (이렇게 해야 index.html을 더블클릭해서 열어도 화면이 정상적으로 보이고,
     나중에 "다운로드" 기능도 문제없이 작동한다)
    ============================================================ */
-document.getElementById("background-image").src = BASE64_IMAGES.background;
-document.getElementById("tape-image").src = BASE64_IMAGES.tape;
 
 
 /* =========================
